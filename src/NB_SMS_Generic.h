@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -37,89 +38,79 @@
 
 #include "NB_Type_Generic.h"
 
-#define NB_SMS_CLEAR_READ             (1)
-#define NB_SMS_CLEAR_READ_SENT        (2)
-#define NB_SMS_CLEAR_READ_SENT_UNSENT (3)
-#define NB_SMS_CLEAR_ALL              (4)
 
-class NB_SMS : public Stream {
+class NB_SMS : public Stream
+{
 
-public:
-  /** Constructor
-      @param synch    Determines sync mode
-   */
-  NB_SMS(bool synch = true);
-
-  /** Write a character in SMS message
-      @param c      Character
-      @return size
+  public:
+    /** Constructor
+        @param synch    Determines sync mode
     */
-  size_t write(uint8_t c);
+    NB_SMS(bool synch = true);
 
-  /** Select SMS charset
-      @param charset     Character set, one of "IRA" (default), "GSM", or "UCS2", reads from modem if null.
-      @return returns first char of charset identifier on success and 0 on error
+    /** Write a character in SMS message
+        @param c      Character
+        @return size
     */
-  int setCharset(const char* charset = nullptr);
+    size_t write(uint8_t c);
 
-  /** Begin a SMS to send it
-      @param to     Destination
-      @return error command if it exists
+    /** Select SMS charset
+        @param charset     Character set, one of "IRA" (default), "GSM", or "UCS2", reads from modem if null.
+        @return returns first char of charset identifier on success and 0 on error
     */
-  int beginSMS(const char* to);
+    int setCharset(const char* charset = nullptr);
 
-  /** Get last command status
-      @return returns 0 if last command is still executing, 1 success, >1 error
-   */
-  int ready();
+    /** Begin a SMS to send it
+        @param to     Destination
+        @return error command if it exists
+    */
+    int beginSMS(const char* to);
 
-  /** End SMS
-      @return error command if it exists
-   */
-  int endSMS();
+    /** Get last command status
+        @return returns 0 if last command is still executing, 1 success, >1 error
+    */
+    int ready();
 
-  /** Check if SMS available and prepare it to be read
-      @return number of bytes in a received SMS
-   */
-  int available();
+    /** End SMS
+        @return error command if it exists
+    */
+    int endSMS();
 
-  /** Read sender number phone
-      @param number   Buffer for save number phone
-      @param nlength    Buffer length
-      @return 1 success, >1 error
-   */
-  int remoteNumber(char* number, int nlength); 
+    /** Check if SMS available and prepare it to be read
+        @return number of bytes in a received SMS
+    */
+    int available();
 
-  /** Read one char for SMS buffer (advance circular buffer)
-      @return byte
-   */
-  int read();
+    /** Read sender number phone
+        @param number   Buffer for save number phone
+        @param nlength    Buffer length
+        @return 1 success, >1 error
+    */
+    int remoteNumber(char* number, int nlength);
 
-  /** Read a byte but do not advance the buffer header (circular buffer)
-      @return byte
-   */
-  int peek();
+    /** Read one char for SMS buffer (advance circular buffer)
+        @return byte
+    */
+    int read();
 
-  /** Delete the SMS from Modem memory and process answer
-   */
-  void flush();
-  
-  /** Delete all read and sent SMS from Modem memory and process answer
-   */
-  void clear(int flag = NB_SMS_CLEAR_READ_SENT);
+    /** Read a byte but do not advance the buffer header (circular buffer)
+        @return byte
+    */
+    int peek();
 
-private:
+    /** Delete the SMS from Modem memory and process answer
+    */
+    void flush();
 
-  bool _synch;
-  int _state;
-  String _incomingBuffer;
-  int _smsDataIndex;
-  int _smsDataEndIndex;
-  bool _smsTxActive;
-  int _charset;
-  char _bufferUTF8[4];
-  int _indexUTF8;
-  const char* _ptrUTF8;
+    /** Delete all read and sent SMS from Modem memory and process answer
+    */
+    void clear(int flag = NB_SMS_CLEAR_READ_SENT);
+
+  private:
+
+    NB_SMS_Data _smsData;
+
+    String _incomingBuffer;
 };
 
 #include "NB_SMS_Generic_Impl.hpp"

@@ -18,6 +18,7 @@
   * [To be Supported modems](#to-be-supported-modems)
   * [Currently supported Boards](#currently-supported-boards)
 * [Changelog](#changelog)
+  * [Major Release v1.1.0](#major-release-v110)
   * [Release v1.0.1](#release-v101)
   * [Release v1.0.0](#release-v100)
 * [Prerequisites](#prerequisites)
@@ -167,6 +168,15 @@ This [**NB_Generic** library](https://github.com/khoih-prog/NB_Generic) currentl
 ---
 
 ## Changelog
+
+### Major Release v1.1.0
+
+1. Rewrite to isolate AT-command hardware-specific code to prepare for supporting more GSM/GPRS modules
+2. Add FileUtils-related examples
+3. Make NB_RESETN, NB_PWR optional for u-blox GSM/GPRS modems
+4. Permit configure baudrate of NB-IOTLTE-M/GPRS Modem
+5. Reduce hardcoding
+6. Add `Bug Report` and `Feature Request` templates
 
 ### Release v1.0.1
 
@@ -1363,6 +1373,15 @@ Sometimes, the library will only work if you update the board core to the newer 
 ---
 
 ## Releases
+
+### Major Release v1.1.0
+
+1. Rewrite to isolate AT-command hardware-specific code to prepare for supporting more GSM/GPRS modules
+2. Add FileUtils-related examples
+3. Make NB_RESETN, NB_PWR optional for u-blox GSM/GPRS modems
+4. Permit configure baudrate of NB-IOTLTE-M/GPRS Modem
+5. Reduce hardcoding
+6. Add `Bug Report` and `Feature Request` templates
 
 ### Release v1.0.1
 

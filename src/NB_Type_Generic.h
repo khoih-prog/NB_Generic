@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -55,6 +56,9 @@ byte charToInt(byte input)
   return input;
 }
 
+// To use for String.indexOf(), String.lastIndexOf()
+#define SUBSTRING_NOT_FOUND       (-1)
+
 ///////////////////////////////////////////////////////////////
 // Originally from Modem_???_Generic.h
 
@@ -70,7 +74,8 @@ enum
   NB_RESPONSE_IDLE           =  0, 
   NB_RESPONSE_OK             =  1, 
   NB_RESPONSE_ERROR          =  2, 
-  NB_RESPONSE_NO_CARRIER     =  3, 
+  NB_RESPONSE_NO_CARRIER     =  3,
+  NB_RESPONSE_CME_ERROR      =  4 
 };
 
 ///////////////////////////////////////////////////////////////
@@ -133,6 +138,9 @@ typedef struct
   NB_NetworkStatus_t    _state;
   int                   _readyState;
   const char*           _pin;
+  const char*           _apn;
+  const char*           _username;
+  const char*           _password;
   unsigned long         _timeout;
 } NB_Data;
 
@@ -173,6 +181,16 @@ enum
 ///////////////////////////////////////////////////////////////
 // Originally from NB_SMS_Generic.h
 
+#define NB_SMS_CLEAR_READ             (1)
+#define NB_SMS_CLEAR_READ_SENT        (2)
+#define NB_SMS_CLEAR_READ_SENT_UNSENT (3)
+#define NB_SMS_CLEAR_ALL              (4)
+
+#define SMS_CHARSET_IRA   'I'
+#define SMS_CHARSET_GSM   'G'
+#define SMS_CHARSET_NONE  'N' 
+#define SMS_CHARSET_UCS2  'U'
+
 enum 
 {
   SMS_STATE_IDLE,
@@ -180,13 +198,19 @@ enum
   SMS_STATE_WAIT_LIST_MESSAGES_RESPONSE
 };
 
+#define NB_SMS_UTF8_BUFFER_SZ         (4)
+
 typedef struct
 {
-  bool    synch;
-  int     state;
-  int     smsDataIndex;
-  int     smsDataEndIndex;
-  bool    smsTxActive;
+  bool        synch;
+  int         state;
+  int         smsDataIndex;
+  int         smsDataEndIndex;
+  bool        smsTxActive;
+  int         charset;
+  char        bufferUTF8[NB_SMS_UTF8_BUFFER_SZ];
+  int         indexUTF8;
+  const char* ptrUTF8;
 } NB_SMS_Data;
 
 // Originally from NB_SSLClient_Generic_Impl.hpp
@@ -232,6 +256,8 @@ enum
   SIM_PIN_WRITE_WRONG_PIN = -2
 };
 
+
+
 /*
   Network registration status +CREG
   • 0: not registered, the MT is not currently searching a new operator to register to
@@ -276,5 +302,20 @@ enum
   NB_NETWORK_CHECK_IS_ROAMING                =  1,
   NB_NETWORK_CHECK_IS_EMERGENCY_ONLY         =  2,
 };
+    
+    
+///////////////////////////////////////////////////////////////
+// Originally from NBUDP_Generic.h
+// To permit changing from sketch UDP TX/RX buffer size if necessary
+// TO be used in Modem_???_Extra_Generic.hpp
+#if !defined(NB_UDP_RX_BUFFER_SIZE)
+  #define NB_UDP_RX_BUFFER_SIZE      512
+#endif
+
+#if !defined(NB_UDP_TX_BUFFER_SIZE)
+  #define NB_UDP_TX_BUFFER_SIZE      512
+#endif
+
+///////////////////////////////////////////////////////////////
     
 #endif    // _NB_TYPE_GENERIC_H_INCLUDED

@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
  
 #pragma once
@@ -34,44 +35,52 @@
 #include <Arduino.h>
 
 
-class NBFileUtils 
+class NBFileUtils
 {
-public:
+  public:
     NBFileUtils(bool debug = false);
 
-    bool begin(const bool restart);
-    
-    bool begin() 
-    { 
-      return begin(true); 
+    bool begin(unsigned long baud = 115200, const bool restart = true);
+
+    bool begin(const bool restart = true)
+    {
+      return begin(115200, restart);
     }
 
     int existFile(const String filename);
 
-    uint32_t fileCount() const 
-    { 
-      return _count; 
+    uint32_t fileCount() const
+    {
+      return _count;
     }
-    
+
     size_t listFiles(String list[]) const;
     uint32_t listFile(const String filename) const;
 
     uint32_t downloadFile(const String filename, const char buf[], const uint32_t size, const bool append);
-    uint32_t downloadFile(const String filename, const char buf[], const uint32_t size) { return downloadFile(filename, buf, size, false); };
-    uint32_t downloadFile(const String filename, const String& buf) { return downloadFile(filename, buf.c_str(), buf.length(), false); }
+
+    uint32_t downloadFile(const String filename, const char buf[], const uint32_t size)
+    {
+      return downloadFile(filename, buf, size, false);
+    };
+
+    uint32_t downloadFile(const String filename, const String& buf)
+    {
+      return downloadFile(filename, buf.c_str(), buf.length(), false);
+    }
 
     uint32_t createFile(const String filename, const char buf[], uint32_t size);
 
     uint32_t appendFile(const String filename, const String& buf)
-    { 
-      return downloadFile(filename, buf.c_str(), buf.length(), true); 
+    {
+      return downloadFile(filename, buf.c_str(), buf.length(), true);
     }
-    
-    uint32_t appendFile(const String filename, const char buf[], const uint32_t size) 
-    { 
-      return downloadFile(filename, buf, size, true); 
+
+    uint32_t appendFile(const String filename, const char buf[], const uint32_t size)
+    {
+      return downloadFile(filename, buf, size, true);
     }
-    
+
     bool deleteFile(const String filename);
     int deleteFiles();
 
@@ -81,7 +90,7 @@ public:
 
     uint32_t freeSpace();
 
-private:
+  private:
 
     int _count;
     String _files;

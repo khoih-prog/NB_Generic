@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -57,75 +58,76 @@ NBSSLClient::~NBSSLClient()
 int NBSSLClient::ready()
 {
   if ((!_customRootCerts && _defaultRootCertsLoaded) ||
-      (_customRootCerts && (_numRCs == 0 || _customRootCertsLoaded))) 
+      (_customRootCerts && (_numRCs == 0 || _customRootCertsLoaded)))
   {
     // root certs loaded already, continue to regular NBClient
     return NBClient::ready();
   }
 
   int ready = MODEM.ready();
-  
-  if (ready == 0) 
+
+  if (ready == 0)
   {
     // a command is still running
     return 0;
   }
 
-  switch (_state) 
+  switch (_state)
   {
-    case SSL_CLIENT_STATE_LOAD_ROOT_CERT: 
-    {
-      if (_RCs[_certIndex].size) 
+    case SSL_CLIENT_STATE_LOAD_ROOT_CERT:
       {
-        // load the next root cert
-        MODEM.sendf("AT+USECMNG=0,0,\"%s\",%d", _RCs[_certIndex].name, _RCs[_certIndex].size);
-        
-        if (MODEM.waitForPrompt() != 1) 
+        if (_RCs[_certIndex].size)
         {
-          // failure
-          ready = -1;
-        } 
-        else 
+          // load the next root cert
+          MODEM.loadRootCert(_RCs[_certIndex]);
+
+          if (MODEM.waitForPrompt() != 1)
+          {
+            // failure
+            ready = -1;
+          }
+          else
+          {
+            // send the cert contents
+            MODEM.write(_RCs[_certIndex].data, _RCs[_certIndex].size);
+            
+            _state = SSL_CLIENT_STATE_WAIT_LOAD_ROOT_CERT_RESPONSE;
+            ready = 0;
+          }
+        }
+        else
         {
-          // send the cert contents
-          MODEM.write(_RCs[_certIndex].data, _RCs[_certIndex].size);
-          _state = SSL_CLIENT_STATE_WAIT_LOAD_ROOT_CERT_RESPONSE;
+          // remove the next root cert name
+          MODEM.removeRootCert(_RCs[_certIndex]);
+
+          _state = SSL_CLIENT_STATE_WAIT_DELETE_ROOT_CERT_RESPONSE;
           ready = 0;
         }
-      } 
-      else 
-      {
-        // remove the next root cert name
-        MODEM.sendf("AT+USECMNG=2,0,\"%s\"", _RCs[_certIndex].name);
 
-        _state = SSL_CLIENT_STATE_WAIT_DELETE_ROOT_CERT_RESPONSE;
-        ready = 0;
+        break;
       }
-      
-      break;
-    }
 
-    case SSL_CLIENT_STATE_WAIT_LOAD_ROOT_CERT_RESPONSE: 
-    {
-      if (ready > 1) 
+    case SSL_CLIENT_STATE_WAIT_LOAD_ROOT_CERT_RESPONSE:
       {
-        // error
-      } 
-      else 
+        if (ready > 1)
+        {
+          // error
+        }
+        else
+        {
+          ready = iterateCerts();
+        }
+
+        break;
+      }
+
+    case SSL_CLIENT_STATE_WAIT_DELETE_ROOT_CERT_RESPONSE:
       {
+        // ignore ready response, root cert might not exist
         ready = iterateCerts();
-      }
-      
-      break;
-    }
 
-    case SSL_CLIENT_STATE_WAIT_DELETE_ROOT_CERT_RESPONSE: 
-    {
-      // ignore ready response, root cert might not exist
-      ready = iterateCerts();
-      
-      break;
-    }
+        break;
+      }
   }
 
   return ready;
@@ -150,25 +152,25 @@ int NBSSLClient::connect(const char* host, uint16_t port)
 int NBSSLClient::iterateCerts()
 {
   _certIndex++;
-  
-  if (_certIndex == _numRCs) 
+
+  if (_certIndex == _numRCs)
   {
     // all certs loaded
-    if (_customRootCerts) 
+    if (_customRootCerts)
     {
       _customRootCertsLoaded = true;
-    } 
-    else 
+    }
+    else
     {
       _defaultRootCertsLoaded = true;
     }
-  } 
-  else 
+  }
+  else
   {
     // load next
     _state = SSL_CLIENT_STATE_LOAD_ROOT_CERT;
   }
-  
+
   return 0;
 }
 

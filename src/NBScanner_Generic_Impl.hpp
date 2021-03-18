@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -33,105 +34,32 @@
 
 NBScanner::NBScanner(bool trace)
 {
-  if (trace) 
+  if (trace)
   {
     MODEM.debug();
   }
 }
 
-NB_NetworkStatus_t NBScanner::begin()
+NB_NetworkStatus_t NBScanner::begin(unsigned long baud)
 {
-  MODEM.begin();
+  MODEM.begin(baud);
 
   return NB_IDLE;
 }
 
 String NBScanner::getCurrentCarrier()
 {
-  String response;
-
-  MODEM.send("AT+COPS?");
-  
-  if (MODEM.waitForResponse(180000, &response) == 1) 
-  {
-    int firstQuoteIndex = response.indexOf('"');
-    int lastQuoteIndex = response.lastIndexOf('"');
-
-    if (firstQuoteIndex != -1 && lastQuoteIndex != -1 && firstQuoteIndex != lastQuoteIndex) 
-    {
-      return response.substring(firstQuoteIndex + 1, lastQuoteIndex);
-    }
-  }
-
-  return "";
+  return MODEM.getCurrentCarrier();
 }
 
 String NBScanner::getSignalStrength()
 {
-  String response;
-
-  MODEM.send("AT+CSQ");
-  
-  if (MODEM.waitForResponse(100, &response) == 1) 
-  {
-    int firstSpaceIndex = response.indexOf(' ');
-    int lastCommaIndex = response.lastIndexOf(',');
-
-    if (firstSpaceIndex != -1 && lastCommaIndex != -1) 
-    {
-      return response.substring(firstSpaceIndex + 1, lastCommaIndex);
-    }
-  }
-
-  return "";
+  return MODEM.getSignalStrength();
 }
 
 String NBScanner::readNetworks()
 {
-  String response;
-
-  MODEM.send("AT+COPS=?");
-  
-  if (MODEM.waitForResponse(180000, &response) == 1) 
-  {
-    String result;
-    unsigned int responseLength = response.length();
-
-    for(unsigned int i = 0; i < responseLength; i++) 
-    {
-      for (; i < responseLength; i++) 
-      {
-        if (response[i] == '"') 
-        {
-          result += "> ";
-          break;
-        }
-      }
-
-      for (i++; i < responseLength; i++) 
-      {
-        if (response[i] == '"') 
-        {
-          result += '\n';
-          break;
-        }
-
-        result += response[i];
-      }
-
-      for (i++; i < responseLength; i++) 
-      {
-        if (response[i] == ')') 
-        {
-          break;
-        }
-      }
-    }
-
-    return result;
-  }
-
-  return "";
+  return MODEM.readNetworks();
 }
 
 #endif    // _NB_SCANNER_GENERIC_IMPL_H_INCLUDED

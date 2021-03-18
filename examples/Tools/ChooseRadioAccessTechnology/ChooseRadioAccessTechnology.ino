@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.
 
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 /*
   Radio Access Technology selection for Arduino MKR NB 1500
@@ -52,6 +53,9 @@
 */
 
 #include "defines.h"
+
+// BaudRate to communicate to NB-IoT/GPRS modem. If be limit to max 115200 inside modem
+unsigned long baudRateSerialNB  = 115200;
 
 bool setRAT(String choice)
 {
@@ -109,7 +113,7 @@ void setup()
   MODEM.debug(DEBUG_NB_GENERIC_PORT);
 #endif
 
-  MODEM.begin();
+  MODEM.begin(baudRateSerialNB);
 
   while (!MODEM.noop());
 

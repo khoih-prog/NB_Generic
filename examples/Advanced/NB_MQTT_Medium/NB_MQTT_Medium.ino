@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.
 
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 /****************************************************************************************************************************
   You have to modify file ./libraries/Adafruit_MQTT_Library/Adafruit_MQTT.cpp as follows to avoid dtostrf error, if exists
@@ -336,7 +337,7 @@ void connectToGPRS()
   
   // After starting the modem with NB.begin()
   // attach the shield to the GPRS network with the APN, login and password
-  while ((nbAccess.begin(PINNUMBER) != NB_READY) || (gprs.attachGPRS() != GPRS_READY)) 
+  while ((nbAccess.begin(baudRateSerialNB, PINNUMBER) != NB_READY) || (gprs.attachGPRS() != GPRS_READY)) 
   {
     // failed, retry
     Serial.print("Connect GPRS failed, try = "); Serial.println(tryNumber);

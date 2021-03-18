@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -35,47 +36,19 @@ NBModem::NBModem()
 {
 }
 
-int NBModem::begin()
+int NBModem::begin(unsigned long baud)
 {
-  if (!MODEM.begin()) 
-  {
-    return 0;
-  }
-
-  return 1;
+  return MODEM.begin(baud);
 }
 
 String NBModem::getIMEI()
 {
-  String imei;
-
-  imei.reserve(15);
-
-  MODEM.send("AT+CGSN");
-  MODEM.waitForResponse(100, &imei);
-
-  return imei;
+  return MODEM.getIMEI();
 }
 
 String NBModem::getICCID()
 {
-  String iccid;
-
-  iccid.reserve(7 + 20);
-
-  MODEM.send("AT+CCID");
-  MODEM.waitForResponse(1000, &iccid);
-
-  if (iccid.startsWith("+CCID: ")) 
-  {
-    iccid.remove(0, 7);
-  } 
-  else 
-  {
-    iccid = "";
-  }
-
-  return iccid;
+  return MODEM.getICCID();
 }
 
 #endif    // _NB_MODEM_GENERIC_IMPL_H_INCLUDED

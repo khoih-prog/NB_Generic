@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -42,59 +43,48 @@
 
 #include "NBModem_Generic.h"
 
-class GPRS 
+class GPRS : public GPRS_ModemUrcHandler
 {
 
-public:
+  public:
 
-  GPRS();
-  virtual ~GPRS();
+    GPRS();
+    virtual ~GPRS();
 
-  /** Attach to GPRS/NB network
-      @return connection status
-   */
-  NB_NetworkStatus_t networkAttach()
-  {
+    /** Attach to GPRS/NB network
+        @return connection status
+    */
+    NB_NetworkStatus_t networkAttach()
+    {
       return attachGPRS();
-  };
+    }
 
-  /** Detach GPRS/NB network
-      @return connection status
-   */
-  NB_NetworkStatus_t networkDetach(){ return detachGPRS(); };
+    /** Detach GPRS/NB network
+        @return connection status
+    */
+    NB_NetworkStatus_t networkDetach()
+    {
+      return detachGPRS();
+    }
 
+    /** Attach to GPRS service
+        @param synchronous  Sync mode
+        @return connection status
+    */
+    NB_NetworkStatus_t attachGPRS(bool synchronous = true);
 
-  /** Returns 0 if last command is still executing
-      @return 1 if success, >1 if error
-   */
-  int ready();
+    /** Detach GPRS service
+        @param synchronous  Sync mode
+        @return connection status
+    */
+    NB_NetworkStatus_t detachGPRS(bool synchronous = true);
 
-  /** Attach to GPRS service
-      @param synchronous  Sync mode
-      @return connection status
-   */
-  NB_NetworkStatus_t attachGPRS(bool synchronous = true);
+    void setTimeout(unsigned long timeout);
+    NB_NetworkStatus_t status();
 
-  /** Detach GPRS service
-      @param synchronous  Sync mode
-      @return connection status
-   */
-  NB_NetworkStatus_t detachGPRS(bool synchronous = true);
+  private:
 
-  /** Get actual assigned IP address in IPAddress format
-      @return IP address in IPAddress format
-   */
-  IPAddress getIPAddress();
-  void setTimeout(unsigned long timeout);
-  NB_NetworkStatus_t status();
-
-private:
-
-  int                 _state;
-  NB_NetworkStatus_t  _status;
-  String              _response;
-  int                 _pingResult;
-  unsigned long       _timeout;
+    unsigned long _timeout;
 };
 
 #include "NB_GPRS_Generic_Impl.hpp"

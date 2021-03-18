@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.
 
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 /*
@@ -53,6 +54,9 @@ NBSSLClient client;
 GPRS gprs;
 NB nbAccess;
 
+// BaudRate to communicate to NB-IoT/GPRS modem. If be limit to max 115200 inside modem
+unsigned long baudRateSerialNB  = 115200;
+
 // URL, path and port (for example: arduino.cc)
 char server[] = "arduino.cc";
 char path[]   = "/asciilogo.txt";
@@ -80,7 +84,7 @@ void setup()
   // attach to the GPRS network
   while (!connected)
   {
-    if ((nbAccess.begin(PINNUMBER) == NB_READY) && (gprs.attachGPRS() == GPRS_READY))
+    if ((nbAccess.begin(baudRateSerialNB, PINNUMBER) == NB_READY) && (gprs.attachGPRS() == GPRS_READY))
     {
       connected = true;
     }

@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -37,35 +38,35 @@
 
 #include "NB_Generic.h"
 
-class NBScanner 
+class NBScanner
 {
 
-public:
-  /** Constructor
-      @param trace    if true, dumps all AT dialogue to Serial
-      @return - 
-  */
-  NBScanner(bool trace = false);
+  public:
+    /** Constructor
+        @param trace    if true, dumps all AT dialogue to Serial
+        @return -
+    */
+    NBScanner(bool trace = false);
 
-  /** begin (forces modem hardware restart, so we begin from scratch)
-      @return Always returns IDLE status
-  */
-  NB_NetworkStatus_t begin();
+    /** begin (forces modem hardware restart, so we begin from scratch)
+        @return Always returns IDLE status
+    */
+    NB_NetworkStatus_t begin(unsigned long baud = 115200);
 
-  /** Read current carrier
-      @return Current carrier
-   */
-  String getCurrentCarrier();
+    /** Read current carrier
+        @return Current carrier
+    */
+    String getCurrentCarrier();
 
-  /** Obtain signal strength
-      @return Signal Strength
-   */
-  String getSignalStrength();
+    /** Obtain signal strength
+        @return Signal Strength
+    */
+    String getSignalStrength();
 
-  /** Search available carriers
-    @return A string with list of networks available
-   */
-  String readNetworks();
+    /** Search available carriers
+      @return A string with list of networks available
+    */
+    String readNetworks();
 };
 
 #include "NBScanner_Generic_Impl.hpp"

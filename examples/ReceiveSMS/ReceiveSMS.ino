@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.
 
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 /*
@@ -51,6 +52,9 @@ const char PINNUMBER[]     = SECRET_PINNUMBER;
 NB nbAccess;
 NB_SMS sms;
 
+// BaudRate to communicate to NB-IoT modem. If be limit to max 115200 inside modem
+unsigned long baudRateSerialNB  = 115200;
+
 // Array to hold the number an SMS is retrieved from
 char senderNumber[20];
 
@@ -75,7 +79,7 @@ void setup()
   // Start NB connection
   while (!connected)
   {
-    if (nbAccess.begin(PINNUMBER) == NB_READY)
+    if (nbAccess.begin(baudRateSerialNB, PINNUMBER) == NB_READY)
     {
       connected = true;
     }

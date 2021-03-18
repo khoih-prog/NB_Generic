@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -35,8 +36,6 @@
 #include <string.h>
 
 #define NB_SOCKET_NUM_BUFFERS     (sizeof(_buffers) / sizeof(_buffers[0]))
-
-#define NB_SOCKET_BUFFER_SIZE     512
 
 NBSocketBufferClass::NBSocketBufferClass()
 {
@@ -63,79 +62,7 @@ void NBSocketBufferClass::close(int socket)
 
 int NBSocketBufferClass::available(int socket)
 {
-  if (_buffers[socket].length == 0) 
-  {
-    if (_buffers[socket].data == NULL) 
-    {
-      _buffers[socket].data = _buffers[socket].head = (uint8_t*)malloc(NB_SOCKET_BUFFER_SIZE);
-      _buffers[socket].length = 0;
-    }
-
-    String response;
-
-    MODEM.sendf("AT+USORD=%d,%d", socket, NB_SOCKET_BUFFER_SIZE);
-    
-    int status = MODEM.waitForResponse(10000, &response);
-    
-    if (status != 1) 
-    {
-      if (status == 2) 
-      {
-        return -1;
-      } 
-      else if (status == 4 && response.indexOf("Operation not allowed") != -1 ) 
-      {
-        return -1;
-      } 
-      else 
-      {
-        return 0;
-      }
-    }
-
-    if (!response.startsWith("+USORD: ")) 
-    {
-      return 0;
-    }
-
-    int firstQuoteIndex = response.indexOf("\"");
-
-    response.remove(0, firstQuoteIndex + 1);
-    response.remove(response.length() - 1);
-
-    size_t size = response.length() / 2;
-
-    for (size_t i = 0; i < size; i++) 
-    {
-      byte n1 = response[i * 2];
-      byte n2 = response[i * 2 + 1];
-
-      if (n1 > '9') 
-      {
-        n1 = (n1 - 'A') + 10;
-      } 
-      else 
-      {
-        n1 = (n1 - '0');
-      }
-
-      if (n2 > '9') 
-      {
-        n2 = (n2 - 'A') + 10;
-      } 
-      else 
-      {
-        n2 = (n2 - '0');
-      }
-
-      _buffers[socket].data[i] = (n1 << 4) | n2;
-    }
-
-    _buffers[socket].head = _buffers[socket].data;
-    _buffers[socket].length = size;
-  }
-
-  return _buffers[socket].length;
+  return MODEM.availableSocketBuffer(socket, _buffers[socket]);
 }
 
 int NBSocketBufferClass::peek(int socket)
@@ -150,19 +77,19 @@ int NBSocketBufferClass::peek(int socket)
 
 int NBSocketBufferClass::read(int socket, uint8_t* data, size_t length)
 {
-  int avail = available(socket);
+  uint16_t avail = available(socket);
 
   if (!avail) 
   {
     return 0;
   }
 
-  if (avail < (int)length) 
+  if (avail < (uint16_t)length) 
   {
     length = avail;
   }
 
-  memcpy(data, _buffers[socket].head, length);
+  memcpy(data, _buffers[socket].head, (uint16_t) length);
   _buffers[socket].head += length;
   _buffers[socket].length -= length;
 

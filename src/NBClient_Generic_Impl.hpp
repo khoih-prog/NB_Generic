@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -39,17 +40,18 @@ NBClient::NBClient(bool synch) :
 {
 }
 
-NBClient::NBClient(int socket, bool synch) :
-  _synch(synch),
-  _socket(socket),
-  _connected(false),
-  _state(CLIENT_STATE_IDLE),
-  _ip((uint32_t)0),
-  _host(NULL),
-  _port(0),
-  _ssl(false),
-  _writeSync(true)
+NBClient::NBClient(int socket, bool synch)
 {
+  _synch         = synch;
+  _socket        = socket;
+  _connected      = false;
+  _state          = CLIENT_STATE_IDLE;
+  _ip             = (uint32_t) 0;
+  _host           = NULL;
+  _port           = 0;
+  _ssl            = false;
+  _writeSync      = true;
+
   MODEM.addUrcHandler(this);
 }
 
@@ -58,238 +60,72 @@ NBClient::~NBClient()
   MODEM.removeUrcHandler(this);
 }
 
-int NBClient::ready()
-{
-  int ready = MODEM.ready();
-
-  if (ready == 0) 
-  {
-    return 0;
-  }
-
-  switch (_state) 
-  {
-    case CLIENT_STATE_IDLE:
-    default: 
-    {
-      break;
-    }
-
-    case CLIENT_STATE_CREATE_SOCKET: 
-    {
-      MODEM.setResponseDataStorage(&_response);
-      MODEM.send("AT+USOCR=6");
-
-      _state = CLIENT_STATE_WAIT_CREATE_SOCKET_RESPONSE;
-      ready = 0;
-      break;
-    }
-
-    case CLIENT_STATE_WAIT_CREATE_SOCKET_RESPONSE: 
-    {
-      if (ready > 1 || !_response.startsWith("+USOCR: ")) 
-      {
-        _state = CLIENT_STATE_IDLE;
-      } 
-      else 
-      {
-        _socket = _response.charAt(_response.length() - 1) - '0';
-
-        if (_ssl) 
-        {
-          _state = CLIENT_STATE_ENABLE_SSL;
-        } 
-        else 
-        {
-          _state = CLIENT_STATE_CONNECT;
-        }
-
-        ready = 0;
-      }
-      
-      break;
-    }
-
-    case CLIENT_STATE_ENABLE_SSL: 
-    {
-      MODEM.sendf("AT+USOSEC=%d,1,0", _socket);
-
-      _state = CLIENT_STATE_WAIT_ENABLE_SSL_RESPONSE;
-      ready = 0;
-      
-      break;
-    }
-
-    case CLIENT_STATE_WAIT_ENABLE_SSL_RESPONSE: 
-    {
-      if (ready > 1) 
-      {
-        _state = CLIENT_STATE_CLOSE_SOCKET;
-      } 
-      else 
-      {
-        _state = CLIENT_STATE_MANAGE_SSL_PROFILE;
-      }
-
-      ready = 0;
-      
-      break;
-    }
-
-    case CLIENT_STATE_MANAGE_SSL_PROFILE: 
-    {
-      MODEM.send("AT+USECPRF=0,0,1");
-
-      _state = CLIENT_STATE_WAIT_MANAGE_SSL_PROFILE_RESPONSE;
-      ready = 0;
-      
-      break;
-    }
-
-    case CLIENT_STATE_WAIT_MANAGE_SSL_PROFILE_RESPONSE: 
-    {
-      if (ready > 1) 
-      {
-        _state = CLIENT_STATE_CLOSE_SOCKET;
-      } 
-      else 
-      {
-        _state = CLIENT_STATE_CONNECT;
-      }
-      ready = 0;
-      
-      break;
-    }
-
-    case CLIENT_STATE_CONNECT: 
-    {
-      if (_host != NULL) 
-      {
-        MODEM.sendf("AT+USOCO=%d,\"%s\",%d", _socket, _host, _port);
-      } 
-      else 
-      {
-        MODEM.sendf("AT+USOCO=%d,\"%d.%d.%d.%d\",%d", _socket, _ip[0], _ip[1], _ip[2], _ip[3], _port);
-      }
-
-      _state = CLIENT_STATE_WAIT_CONNECT_RESPONSE;
-      ready = 0;
-      
-      break;
-    }
-
-    case CLIENT_STATE_WAIT_CONNECT_RESPONSE: 
-    {
-      if (ready > 1) 
-      {
-        _state = CLIENT_STATE_CLOSE_SOCKET;
-
-        ready = 0;
-      } 
-      else 
-      {
-        _connected = true;
-        _state = CLIENT_STATE_IDLE;
-      }
-      
-      break;
-    }
-
-    case CLIENT_STATE_CLOSE_SOCKET: 
-    {
-
-      MODEM.sendf("AT+USOCL=%d", _socket);
-
-      _state = CLIENT_STATE_WAIT_CLOSE_SOCKET;
-      ready = 0;
-      
-      break;
-    }
-
-    case CLIENT_STATE_WAIT_CLOSE_SOCKET: 
-    {
-      _state = CLIENT_STATE_RETRIEVE_ERROR;
-      _socket = -1;
-      break;
-    }
-
-    case CLIENT_STATE_RETRIEVE_ERROR: 
-    {
-      MODEM.send("AT+USOER");
-      _state = CLIENT_STATE_IDLE;
-      break;
-    }
-  }
-
-  return ready;
-}
-
 int NBClient::connect(IPAddress ip, uint16_t port)
 {
-  _ip = ip;
+  _ip   = ip;
   _host = NULL;
   _port = port;
-  _ssl = false;
+  _ssl  = false;
 
   return connect();
 }
 
 int NBClient::connectSSL(IPAddress ip, uint16_t port)
 {
-  _ip = ip;
+  _ip   = ip;
   _host = NULL;
   _port = port;
-  _ssl = true;
+  _ssl  = true;
 
   return connect();
 }
 
 int NBClient::connect(const char *host, uint16_t port)
 {
-  _ip = (uint32_t)0;
+  _ip   = (uint32_t)0;
   _host = host;
   _port = port;
-  _ssl = false;
+  _ssl  = false;
 
   return connect();
 }
 
 int NBClient::connectSSL(const char *host, uint16_t port)
 {
-  _ip = (uint32_t)0;
+  _ip   = (uint32_t)0;
   _host = host;
   _port = port;
-  _ssl = true;
+  _ssl  = true;
 
   return connect();
 }
 
 int NBClient::connect()
 {
-  if (_socket != -1) 
+  if (_socket != -1)
   {
     stop();
   }
 
-  if (_synch) 
+  if (_synch)
   {
-    while (ready() == 0);
-  } 
-  else if (ready() == 0) 
+    while (ready() == NB_RESPONSE_IDLE);
+  }
+  else if (ready() == NB_RESPONSE_IDLE)
   {
     return 0;
   }
 
   _state = CLIENT_STATE_CREATE_SOCKET;
 
-  if (_synch) 
+  if (_synch)
   {
-    while (ready() == 0) 
+    while (ready() == NB_RESPONSE_IDLE)
     {
       delay(100);
     }
 
-    if (_socket == -1) 
+    if (_socket == -1)
     {
       return 0;
     }
@@ -315,81 +151,7 @@ size_t NBClient::write(const uint8_t *buf)
 
 size_t NBClient::write(const uint8_t* buf, size_t size)
 {
-  if (_writeSync) 
-  {
-    while (ready() == 0);
-  } 
-  else if (ready() == 0) 
-  {
-    return 0;
-  }
-
-  if (_socket == -1) 
-  {
-    return 0;
-  }
-
-  size_t written = 0;
-  String command;
-
-  command.reserve(19 + (size > 256 ? 256 : size) * 2);
-
-  while (size) 
-  {
-    size_t chunkSize = size;
-
-    if (chunkSize > 256) 
-    {
-      chunkSize = 256;
-    }
-
-    command.reserve(19 + chunkSize * 2);
-
-    command = "AT+USOWR=";
-    command += _socket;
-    command += ",";
-    command += chunkSize;
-    command += ",\"";
-
-    for (size_t i = 0; i < chunkSize; i++) 
-    {
-      byte b = buf[i + written];
-
-      byte n1 = (b >> 4) & 0x0f;
-      byte n2 = (b & 0x0f);
-
-      command += (char)(n1 > 9 ? 'A' + n1 - 10 : '0' + n1);
-      command += (char)(n2 > 9 ? 'A' + n2 - 10 : '0' + n2);
-    }
-
-    command += "\"";
-
-    MODEM.send(command);
-    
-    if (_writeSync) 
-    {
-      String response;
-      int status = MODEM.waitForResponse(10000, &response);
-      
-      if ( status != 1) 
-      {
-        if (status == 4 && response.indexOf("Operation not allowed") != -1 ) 
-        {
-          stop();
-          break;
-        } 
-        else 
-        {
-          break;
-        }
-      }
-    }
-
-    written += chunkSize;
-    size -= chunkSize;
-  }
-
-  return written;
+  return NBClient_ModemUrcHandler::write(buf, size);
 }
 
 void NBClient::endWrite(bool /*sync*/)
@@ -401,18 +163,22 @@ uint8_t NBClient::connected()
 {
   MODEM.poll();
 
-  if (_socket == -1) 
+  if (_socket == -1)
   {
     return 0;
   }
 
   // call available to update socket state
-  if (NBSocketBuffer.available(_socket) < 0 || (_ssl && !_connected)) 
+  if (NBSocketBuffer.available(_socket) < 0 || (_ssl && !_connected))
   {
+    NB_LOGDEBUG(F("NBClient::connected: no socket"));
+
     stop();
 
     return 0;
   }
+
+  NB_LOGDEBUG(F("NBClient::connected: OK"));
 
   return 1;
 }
@@ -424,19 +190,19 @@ NBClient::operator bool()
 
 int NBClient::read(uint8_t *buf, size_t size)
 {
-  if (_socket == -1) 
+  if (_socket == -1)
   {
     return 0;
   }
 
-  if (size == 0) 
+  if (size == 0)
   {
     return 0;
   }
 
   int avail = available();
 
-  if (avail == 0) 
+  if (avail == 0)
   {
     return 0;
   }
@@ -448,7 +214,7 @@ int NBClient::read()
 {
   byte b;
 
-  if (read(&b, 1) == 1) 
+  if (read(&b, 1) == 1)
   {
     return b;
   }
@@ -458,23 +224,23 @@ int NBClient::read()
 
 int NBClient::available()
 {
-  if (_synch) 
+  if (_synch)
   {
-    while (ready() == 0);
-  } 
-  else if (ready() == 0) 
+    while (ready() == NB_RESPONSE_IDLE);
+  }
+  else if (ready() == NB_RESPONSE_IDLE)
   {
     return 0;
   }
 
-  if (_socket == -1) 
+  if (_socket == -1)
   {
     return 0;
   }
 
   int avail = NBSocketBuffer.available(_socket);
 
-  if (avail < 0) 
+  if (avail < 0)
   {
     stop();
 
@@ -486,7 +252,7 @@ int NBClient::available()
 
 int NBClient::peek()
 {
-  if (available() > 0) 
+  if (available() > 0)
   {
     return NBSocketBuffer.peek(_socket);
   }
@@ -500,36 +266,7 @@ void NBClient::flush()
 
 void NBClient::stop()
 {
-  _state = CLIENT_STATE_IDLE;
-  
-  if (_socket < 0) 
-  {
-    return;
-  }
-
-  MODEM.sendf("AT+USOCL=%d", _socket);
-  MODEM.waitForResponse(10000);
-
-  NBSocketBuffer.close(_socket);
-
-  _socket = -1;
-  _connected = false;
-}
-
-void NBClient::handleUrc(const String& urc)
-{
-  if (urc.startsWith("+UUSORD: ")) 
-  {
-    int socket = urc.charAt(9) - '0';
-    
-    if (socket == _socket) 
-    {
-      if (urc.endsWith(",4294967295")) 
-      {
-        _connected = false;
-      }
-    }
-  }
+  NBClient_ModemUrcHandler::stop();
 }
 
 #endif    // _NB_CLIENT_GENERIC_IMPL_H_INCLUDED

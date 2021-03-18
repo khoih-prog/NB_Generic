@@ -74,7 +74,7 @@
 // Optional usage of NB_RESETN and NB_DTR. Need to be here only when true. Default is false
 
 //#define UBLOX_USING_RESET_PIN             true
-//#define UBLOX_USING_LOW_POWER_MODE        true
+//#define UBLOX_USING_POWER_ON_PIN          true
 
 //////////////////////////////////////////////
 

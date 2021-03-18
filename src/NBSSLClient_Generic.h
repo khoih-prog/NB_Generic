@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -38,22 +39,21 @@
 #include "NBClient_Generic.h"
 #include "utility/NBRootCerts_Generic.h"
 
-class NBSSLClient : public NBClient 
+class NBSSLClient : public NBClient
 {
+  public:
+    NBSSLClient(bool synch = true);
+    NBSSLClient(const NBRootCert* myRCs, int myNumRCs, bool synch = true);
+    virtual ~NBSSLClient();
 
-public:
-  NBSSLClient(bool synch = true);
-  NBSSLClient(const NBRootCert* myRCs, int myNumRCs, bool synch = true);
-  virtual ~NBSSLClient();
+    virtual int ready();
+    virtual int iterateCerts();
 
-  virtual int ready();
-  virtual int iterateCerts();
-
-  virtual int connect(IPAddress ip, uint16_t port);
-  virtual int connect(const char* host, uint16_t port);
+    virtual int connect(IPAddress ip, uint16_t port);
+    virtual int connect(const char* host, uint16_t port);
 
   private:
-  
+
     const NBRootCert* _RCs;
     int _numRCs;
     static bool _defaultRootCertsLoaded;
@@ -64,6 +64,5 @@ public:
 };
 
 #include "NBSSLClient_Generic_Impl.hpp"
-
 
 #endif    // _NB_SSL_CLIENT_GENERIC_H_INCLUDED

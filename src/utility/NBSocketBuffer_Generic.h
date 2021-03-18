@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -45,12 +46,7 @@ public:
 
 private:
 
-  struct 
-  {
-    uint8_t* data;
-    uint8_t* head;
-    int length;
-  } _buffers[7];
+  SocketBufferList _buffers[NB_SOCKET_BUFFER_NUMBER];
 };
 
 #include "NBSocketBuffer_Generic_Impl.hpp"

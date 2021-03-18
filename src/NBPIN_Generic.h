@@ -18,12 +18,13 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.1
+  Version: 1.1.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
+  1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
  **********************************************************************************************************************************/
 
 #pragma once
@@ -37,64 +38,64 @@
 
 #include "NB_Type_Generic.h"
 
-class NBPIN 
+class NBPIN
 {
 
-public:
+  public:
 
-  /** Constructor */
-  NBPIN();
+    /** Constructor */
+    NBPIN();
 
-  /** Check modem response and restart it
-   */
-  void begin();
+    /** Check modem response and restart it
+    */
+    void begin(unsigned long baud = 115200);
 
-  /** Check if PIN lock or PUK lock is activated
-      @return 0 if PIN lock is off, 1 if PIN lock is on, -1 if PUK lock is on, -2 if error exists
-   */
-  int isPIN();
+    /** Check if PIN lock or PUK lock is activated
+        @return 0 if PIN lock is off, 1 if PIN lock is on, -1 if PUK lock is on, -2 if error exists
+    */
+    int isPIN();
 
-  /** Check if PIN code is correct and valid
-      @param pin      PIN code
-      @return 0 if is correct, -1 if is incorrect
-   */
-  int checkPIN(String pin);
+    /** Check if PIN code is correct and valid
+        @param pin      PIN code
+        @return 0 if is correct, -1 if is incorrect
+    */
+    int checkPIN(String pin);
 
-  /** Check if PUK code is correct and establish new PIN code
-      @param puk      PUK code
-      @param pin      New PIN code
-      @return 0 if successful, otherwise return -1
-   */
-  int checkPUK(String puk, String pin);
+    /** Check if PUK code is correct and establish new PIN code
+        @param puk      PUK code
+        @param pin      New PIN code
+        @return 0 if successful, otherwise return -1
+    */
+    int checkPUK(String puk, String pin);
 
-  /** Change PIN code
-      @param old      Old PIN code
-      @param pin      New PIN code
-   */
-  void changePIN(String old, String pin);
+    /** Change PIN code
+        @param old      Old PIN code
+        @param pin      New PIN code
+    */
+    void changePIN(String old, String pin);
 
-  /** Change PIN lock status
-      @param pin      PIN code
-   */
-  void switchPIN(String pin);
+    /** Change PIN lock status
+        @param pin      PIN code
+    */
+    void switchPIN(String pin);
 
-  /** Check if modem was registered in NB/GPRS network
-      @return 0 if modem was registered, 1 if modem was registered in roaming, -1 if error exists
-   */
-  int checkReg();
+    /** Check if modem was registered in NB/GPRS network
+        @return 0 if modem was registered, 1 if modem was registered in roaming, -1 if error exists
+    */
+    int checkReg();
 
-  /** Return if PIN lock is used
-      @return true if PIN lock is used, otherwise, return false
-   */
-  bool getPINUsed();
+    /** Return if PIN lock is used
+        @return true if PIN lock is used, otherwise, return false
+    */
+    bool getPINUsed();
 
-  /** Set PIN lock status
-      @param used     New PIN lock status
-   */
-  void setPINUsed(bool used);
+    /** Set PIN lock status
+        @param used     New PIN lock status
+    */
+    void setPINUsed(bool used);
 
-private:
-  bool _pinUsed;
+  private:
+    bool _pinUsed;
 };
 
 #include "NBPIN_Generic_Impl.hpp"

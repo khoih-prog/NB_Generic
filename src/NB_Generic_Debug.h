@@ -18,11 +18,12 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.0
+  Version: 1.0.1
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
-  1.0.0    K Hoang     14/09/2020 Initial coding to add support to many boards besides MKRNB 1500
+  1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
+  1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
  **********************************************************************************************************************************/
 
 #pragma once

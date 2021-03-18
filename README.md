@@ -18,6 +18,7 @@
   * [To be Supported modems](#to-be-supported-modems)
   * [Currently supported Boards](#currently-supported-boards)
 * [Changelog](#changelog)
+  * [Release v1.0.1](#release-v101)
   * [Release v1.0.0](#release-v100)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
@@ -49,7 +50,7 @@
     * [NBPIN Class](#nbpin-class)
     * [NBUDP Class](#nbudp-class)
 * [Configuration Notes](#configuration-notes)
-  * [1. How to select which NB/GPRS module to use](#1-how-to-select-which-nbgprs-module-to-use)
+  * [1. How to select which NB-IoT/LTE-M/GPRS module to use](#1-how-to-select-which-nb-iotlte-mgprs-module-to-use)
   * [2. How to select which Serial port to communicate to NB module](#2-how-to-select-which-serial-port-to-communicate-to-nb-module)
   * [3. How to select extra pins to control NB module](#3-how-to-select-extra-pins-to-control-nb-module)
 * [Examples](#examples)
@@ -65,6 +66,15 @@
   * [ 9. SerialNBPassthrough](examples/Tools/SerialNBPassthrough)
   * [10. TestGPRS](examples/Tools/TestGPRS)
   * [11. TestModem](examples/Tools/TestModem)
+  * [Advanced Examples](#advanced-examples)
+    * [MQTT](#mqtt)
+      * [26. NB_MQTT](examples/Advanced/NB_MQTT)
+      * [27. NB_MQTTClient_Auth](examples/Advanced/NB_MQTTClient_Auth)
+      * [28. NB_MQTTClient_Basic](examples/Advanced/NB_MQTTClient_Basic)
+      * [29. NB_MQTT_Medium](examples/Advanced/NB_MQTT_Medium)
+      * [30. NB_MQTT_ThingStream](examples/Advanced/NB_MQTT_ThingStream)
+    * [Blynk](#blynk)
+      * [31. NB_Blynk](examples/Advanced/NB_Blynk)
 * [Example NBWebClient](#example-nbwebclient)
   * [1. File NBWebClient.ino](#1-file-nbwebclientino)
   * [2. File defines.h](#2-file-definesh)
@@ -92,7 +102,7 @@ This library is based on, modified, bug-fixed and improved from:
 
 to add support to many boards besides `Arduino MKR NB 1500`.
 
-This [NB_Generic library](https://github.com/khoih-prog/NB_Generic) will finally provide these following features (certainly ony if supported by the NB/GPRS modules)
+This [NB_Generic library](https://github.com/khoih-prog/NB_Generic) will finally provide these following features (certainly ony if supported by the NB-IoT/LTE-M/GPRS modules)
 
 1. **TCP Client** (HTTP, **HTTPS**, MQTT, Blynk, WebSockets, ...)
 2. **UDP** data connections
@@ -158,9 +168,13 @@ This [**NB_Generic** library](https://github.com/khoih-prog/NB_Generic) currentl
 
 ## Changelog
 
+### Release v1.0.1
+
+1. Add Advanced examples (MQTT, Blynk)
+
 ### Release v1.0.0
 
-1. Initial coding to add support to many boards besides MKRNB 1500 / u-blox NB-IoT / LTE-M modem SARA R401
+1. Initial coding to add support to many boards besides MKRNB 1500 / u-blox NB-IoT/LTE-M/GPRS modems (Sara R4xx NB-IoT/LTE-M modules (SARA-R404M, SARA-R410M, SARA-R412M, SARA-N410, etc)
 
 ---
 ---
@@ -358,15 +372,15 @@ Currently, check [Reference of MKRNB](https://www.arduino.cc/en/Reference/MKRNB)
 
 ### 1. How it works
 
-This library enable you to do most of the operations you can do with a NB phone: place and receive voice calls, send and receive SMS, and connect to the internet over a GPRS network. The onboard NB/GPRS module, operates in 3G with a 2G fallback.
+This library enable you to do most of the operations you can do with a NB phone: place and receive voice calls, send and receive SMS, and connect to the internet over a GPRS network. The onboard NB-IoT/LTE-M/GPRS module, operates in 3G with a 2G fallback.
 
-The NB/GPRS modem transfers data, received from a serial port, to the NB/GPRS network. The modem executes operations via a series of AT commands. The library abstracts low level communications between the modem and SIM card. It relies on the Serial library for communication between the modem and your board.
+The NB-IoT/LTE-M/GPRS modem transfers data, received from a serial port, to the NB-IoT/LTE-M/GPRS network. The modem executes operations via a series of AT commands. The library abstracts low level communications between the modem and SIM card. It relies on the Serial library for communication between the modem and your board.
 
 ### 2. Library structure
 
 As the library enables multiple types of functionality, there are a number of different classes.
 
- 1. `NB` class takes care of commands to the radio modem. This handles the connectivity aspects of the module and registers your system in the NB infrastructure. All of your NB/GPRS programs will need to include an object of this class to handle the necessary low level communication.
+ 1. `NB` class takes care of commands to the radio modem. This handles the connectivity aspects of the module and registers your system in the NB infrastructure. All of your NB-IoT/LTE-M/GPRS programs will need to include an object of this class to handle the necessary low level communication.
  2. `NB_SMS` class manages Sending/Receiving SMS messages.
  3. `GPRS` class manages connecting to the internet.
  4. `NBClient` class includes implementations for a client, similar to the Ethernet and WiFi libraries.
@@ -905,7 +919,7 @@ void changePIN(String old, String pin);
  */
 void switchPIN(String pin);
 
-/** Check if modem was registered in NB/GPRS network
+/** Check if modem was registered in NB-IoT/LTE-M/GPRS network
     @return 0 if modem was registered, 1 if modem was registered in roaming, -1 if error exists
  */
 int checkReg();
@@ -997,7 +1011,7 @@ virtual void handleUrc(const String& urc);
 
 ### Configuration Notes
 
-#### 1. How to select which NB/GPRS module to use
+#### 1. How to select which NB-IoT/LTE-M/GPRS module to use
 
 
 Select **one and only one** NB module to use (`true`) as follows:
@@ -1099,21 +1113,7 @@ Please follow the instructions for the related NB module.
 
 ---
 ---
-
-* [Examples](#examples)
-  * [ 1. GPRSUdpNtpClient](examples/GPRSUdpNtpClient)
-  * [ 2. NBSSLWebClient](examples/NBSSLWebClient)
-  * [ 3. NBWebClient](examples/NBWebClient)
-  * [ 4. ReceiveSMS](examples/ReceiveSMS)
-  * [ 5. SendSMS](examples/SendSMS)
-* [Tools](#tools)
-  * [ 6. ChooseRadioAccessTechnology](examples/Tools/ChooseRadioAccessTechnology)
-  * [ 7. NBScanNetworks](examples/Tools/NBScanNetworks)
-  * [ 8. PinManagement](examples/Tools/PinManagement)
-  * [ 9. SerialNBPassthrough](examples/Tools/SerialNBPassthrough)
-  * [10. TestGPRS](examples/Tools/TestGPRS)
-  * [11. TestModem](examples/Tools/TestModem)
-  
+ 
 ### Examples
 
  1. [GPRSUdpNtpClient](examples/GPRSUdpNtpClient)
@@ -1130,6 +1130,20 @@ Please follow the instructions for the related NB module.
  9. [SerialNBPassthrough](examples/Tools/SerialNBPassthrough)
 10. [TestGPRS](examples/Tools/TestGPRS) 
 11. [TestModem](examples/Tools/TestModem)
+
+### Advanced Examples
+
+#### MQTT
+
+12. [NB_MQTT](examples/Advanced/NB_MQTT)
+13. [NB_MQTTClient_Auth](examples/Advanced/NB_MQTTClient_Auth)
+14. [NB_MQTTClient_Basic](examples/Advanced/NB_MQTTClient_Basic)
+15. [NB_MQTT_Medium](examples/Advanced/NB_MQTT_Medium)
+16. [NB_MQTT_ThingStream](examples/Advanced/NB_MQTT_ThingStream)
+
+#### Blynk
+
+17. [NB_Blynk](examples/Advanced/NB_Blynk)
 
 
 ---
@@ -1247,52 +1261,65 @@ void loop()
 #ifndef defines_h
 #define defines_h
 
-#define DEBUG_NB_Generic_PORT       Serial
+#define DEBUG_NB_GENERIC_PORT       Serial
 
-// Debug Level from 0 to 4
-#define _NB_Generic_LOGLEVEL_       4
+// Debug Level from 0 to 5. Level 5 is to print out AT commands and responses
+#define _NB_GENERIC_LOGLEVEL_       5
 
 #define SECRET_PINNUMBER     ""
-#define SECRET_GPRS_APN      "GPRS_APN" // replace your GPRS APN
-#define SECRET_GPRS_LOGIN    "login"    // replace with your GPRS login
-#define SECRET_GPRS_PASSWORD "password" // replace with your GPRS password
-
-#if ( defined(ARDUINO_NUCLEO_F767ZI) || defined(ARDUINO_NUCLEO_L053R8) )
-  HardwareSerial Serial1(D0, D1);   // (PA3, PA2) for ARDUINO_NUCLEO_L053R8
-#endif
 
 //////////////////////////////////////////////
 
-#if !defined(ARDUINO_SAMD_MKRNB1500)
+#if defined(ARDUINO_SAMD_MKRNB1500)
+  #define SerialNB      SerialSARA
+  #define NB_RESETN     SARA_RESETN
+  #define NB_PWR        SARA_PWR_ON
+#else
   // Override the default (and certainly not good) pins and port
   // Only for boards other than ARDUINO_SAMD_MKRNB1500
   #define NB_RESETN  (10u)
   #define NB_PWR     (11u)
 
-  #if !ESP8266
-    #define SerialNB   Serial1
+  #if ESP8266
+    // Using Software Serial for ESP8266, as Serial1 is TX only
+    #define NB_USING_SOFTWARE_SERIAL     true
   #else
-    #warning Using default SerialNB = Serial => can not use Serial for Debug Terminal
-
-    #define SerialNB   Serial
+    // Optional Software Serial here for other boards, but not advised if HW Serial available
+    #define NB_USING_SOFTWARE_SERIAL     false
   #endif
+   
+  #if NB_USING_SOFTWARE_SERIAL
+    #warning Using default SerialNB = SoftwareSerial
+    
+    #define D8 (15)
+    #define D7 (13)
+    
+    #include <SoftwareSerial.h>
+    
+    SoftwareSerial swSerial(D7, D8);    // (D7, D8, false, 256); // (RX, TX, false, 256);
+    
+    #define SerialNB   swSerial
+  #else
+    #warning Using default SerialNB = HardwareSerial Serial1
+    #define SerialNB   Serial1
+  #endif    // NB_USING_SOFTWARE_SERIAL
 
   #warning You must connect the Modem correctly and modify the pins / Serial port here
+  
 #endif
 
 //////////////////////////////////////////////
 
 //////////////////////////////////////////////
 
-#define NB_MODEM_SARAR4            true
+#define NB_MODEM_SARAR4                     true
 
 //////////////////////////////////////////////
 // Not supported yet
-//////////////////////////////////////////////
-// Not supported yet
-#define NB_MODEM_SIM7000           false
-#define NB_MODEM_XBEE              false
-#define NB_MODEM_SEQUANS_MONARCH   false
+#define NB_MODEM_SIM7000                    false
+#define NB_MODEM_XBEE                       false
+#define NB_MODEM_SEQUANS_MONARCH            false
+
 //////////////////////////////////////////////
 
 // libraries
@@ -1337,9 +1364,13 @@ Sometimes, the library will only work if you update the board core to the newer 
 
 ## Releases
 
+### Release v1.0.1
+
+1. Add Advanced examples (MQTT, Blynk)
+
 ### Release v1.0.0
 
-1. Initial coding to add support to many boards besides MKRNB 1500 / u-blox NB-IoT / LTE-M modem SARA R401
+1. Initial coding to add support to many boards besides MKRNB 1500 / u-blox NB-IoT / LTE-M modems (Sara R4xx NB-IoT/LTE-M modules (SARA-R404M, SARA-R410M, SARA-R412M, SARA-N410, etc)
 
 ---
 
@@ -1352,7 +1383,7 @@ Submit issues to: [**NB_Generic issues**](https://github.com/khoih-prog/NB_Gener
 
 ### TO DO
 1. Bug Searching and Killing
-2. Support more types of NB/GPRS modules
+2. Support more types of NB-IoT/LTE-M/GPRS modules
 
 ---
 
@@ -1366,7 +1397,7 @@ Submit issues to: [**NB_Generic issues**](https://github.com/khoih-prog/NB_Gener
  6. Add support to all **STM32F/L/H/G/WB/MP1 having 64K+** Flash program memory.
  7. Add support to **Seeeduino SAMD21/SAMD51 boards (SEEED_WIO_TERMINAL, SEEED_FEMTO_M0, SEEED_XIAO_M0, Wio_Lite_MG126, WIO_GPS_BOARD, SEEEDUINO_ZERO, SEEEDUINO_LORAWAN, SEEED_GROVE_UI_WIRELESS, etc.)**
  8. Add support to ESP32 (including ESP32-S2) and ESP8266 (only using Hardware Serial)
- 9. Support u-blox Sara R401 NB-IoT/LTE-M module
+ 9. Support u-blox Sara R4xx NB-IoT/LTE-M modules (SARA-R404M, SARA-R410M, SARA-R412M, SARA-N410, etc)
 
 
 ---

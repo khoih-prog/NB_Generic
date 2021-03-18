@@ -18,11 +18,12 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.0.0
+  Version: 1.0.1
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
+  1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
  **********************************************************************************************************************************/
 
 #pragma once
@@ -108,11 +109,11 @@ void NBPIN::changePIN(String old, String pin)
   
   if (MODEM.waitForResponse(10000) == 1) 
   {
-    Serial.println("Pin changed successfully.");
+    NB_LOGERROR("Pin changed successfully.");  
   } 
   else 
   {
-    Serial.println("ERROR");
+    NB_LOGERROR("ERROR");
   }
 }
 
@@ -124,7 +125,7 @@ void NBPIN::switchPIN(String pin)
   
   if (MODEM.waitForResponse(180000, &response) != 1) 
   {
-    Serial.println("ERROR");
+    NB_LOGERROR("ERROR");
     return;
   }
 
@@ -134,12 +135,12 @@ void NBPIN::switchPIN(String pin)
     
     if (MODEM.waitForResponse(180000, &response) == 1) 
     {
-      Serial.println("OK. PIN lock on.");
+      NB_LOGERROR("OK. PIN lock on.");
       _pinUsed = true;
     } 
     else 
     {
-      Serial.println("ERROR");
+      NB_LOGERROR("ERROR");
       _pinUsed = false;
     }
   } 
@@ -149,18 +150,18 @@ void NBPIN::switchPIN(String pin)
     
     if (MODEM.waitForResponse(180000, &response) == 1) 
     {
-      Serial.println("OK. PIN lock off.");
+      NB_LOGERROR("OK. PIN lock off.");
       _pinUsed = false;
     } 
     else 
     {
-      Serial.println("ERROR");
+      NB_LOGERROR("ERROR");
       _pinUsed = true;
     }
   } 
   else 
   {
-    Serial.println("ERROR");
+    NB_LOGERROR("ERROR");
   }
 }
 

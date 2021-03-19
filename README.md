@@ -107,8 +107,7 @@ This [NB_Generic library](https://github.com/khoih-prog/NB_Generic) will finally
 
 1. **TCP Client** (HTTP, **HTTPS**, MQTT, Blynk, WebSockets, ...)
 2. **UDP** data connections
-3. **USSD** (Sending USSD requests and decoding 7,8,16-bit responses)
-4. **SMS** (Sending and Receiving)
+3. **SMS** (Sending and Receiving)
 
 
 ### Supported modems

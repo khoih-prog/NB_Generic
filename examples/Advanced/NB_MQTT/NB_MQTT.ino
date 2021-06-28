@@ -18,21 +18,34 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.
 
-  Version: 1.1.0
+  Version: 1.2.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
   1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
+  1.2.0    K Hoang     28/06/2021 Add support to RP2040-based boards using Arduino mbed or Arduino-pico core
  **********************************************************************************************************************************/
 /****************************************************************************************************************************
   You have to modify file ./libraries/Adafruit_MQTT_Library/Adafruit_MQTT.cpp as follows to avoid dtostrf error, if exists
    
-  //#if defined(ARDUINO_SAMD_ZERO) || defined(ARDUINO_SAMD_MKR1000) ||             \
-  //    defined(ARDUINO_ARCH_SAMD)
-  #if !( ESP32 || ESP8266 || defined(CORE_TEENSY) || defined(STM32F1) || defined(STM32F2) || defined(STM32F3) || defined(STM32F4) || defined(STM32F7) )
-  static char *dtostrf(double val, signed char width, unsigned char prec, char *sout) 
+  #ifdef __cplusplus
+    extern "C" {
+  #endif
+  extern char* itoa(int value, char *string, int radix);
+  extern char* ltoa(long value, char *string, int radix);
+  extern char* utoa(unsigned value, char *string, int radix);
+  extern char* ultoa(unsigned long value, char *string, int radix);
+  #ifdef __cplusplus
+    } // extern "C"
+  #endif
+  //#if defined(ARDUINO_SAMD_ZERO) || defined(ARDUINO_SAMD_MKR1000) || defined(ARDUINO_ARCH_SAMD)
+  #if !( ESP32 || ESP8266 || defined(CORE_TEENSY) || defined(STM32F1) || defined(STM32F2) || defined(STM32F3) || defined(STM32F4) || defined(STM32F7) || \
+       ( defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_ARCH_MBED) ) || ARDUINO_ARCH_SEEED_SAMD || ( defined(SEEED_WIO_TERMINAL) || defined(SEEED_XIAO_M0) || \
+         defined(SEEED_FEMTO_M0) || defined(Wio_Lite_MG126) || defined(WIO_GPS_BOARD) || defined(SEEEDUINO_ZERO) || defined(SEEEDUINO_LORAWAN) || defined(WIO_LTE_CAT) || \
+         defined(SEEED_GROVE_UI_WIRELESS) ) ) 
+  static char *dtostrf(double val, signed char width, unsigned char prec, char *sout)
   {
     char fmt[20];
     sprintf(fmt, "%%%d.%df", width, prec);

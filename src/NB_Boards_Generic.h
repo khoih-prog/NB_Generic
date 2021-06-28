@@ -18,13 +18,14 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.1.0
+  Version: 1.2.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
   1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
+  1.2.0    K Hoang     28/06/2021 Add support to RP2040-based boards using Arduino mbed or Arduino-pico core
  **********************************************************************************************************************************/
 
 #pragma once
@@ -43,31 +44,36 @@
     #undef NB_USE_SAMD
   #endif
   #define NB_USE_SAMD      true
-#endif
 
-#if ( defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
+#elif ( defined(NRF52840_FEATHER) || defined(NRF52832_FEATHER) || defined(NRF52_SERIES) || defined(ARDUINO_NRF52_ADAFRUIT) || \
         defined(NRF52840_FEATHER_SENSE) || defined(NRF52840_ITSYBITSY) || defined(NRF52840_CIRCUITPLAY) || defined(NRF52840_CLUE) || \
         defined(NRF52840_METRO) || defined(NRF52840_PCA10056) || defined(PARTICLE_XENON) || defined(NINA_B302_ublox) || defined(NINA_B112_ublox) )
   #if defined(NB_USE_NRF528XX)
     #undef NB_USE_NRF528XX
   #endif
   #define NB_USE_NRF528XX      true
-#endif
 
-#if ( defined(ARDUINO_SAM_DUE) || defined(__SAM3X8E__) )
+#elif ( defined(ARDUINO_SAM_DUE) || defined(__SAM3X8E__) )
   #if defined(NB_USE_SAM_DUE)
     #undef NB_USE_SAM_DUE
   #endif
   #define NB_USE_SAM_DUE      true
-#endif
 
-#if ( defined(STM32F0) || defined(STM32F1) || defined(STM32F2) || defined(STM32F3)  ||defined(STM32F4) || defined(STM32F7) || \
+#elif ( defined(STM32F0) || defined(STM32F1) || defined(STM32F2) || defined(STM32F3)  ||defined(STM32F4) || defined(STM32F7) || \
        defined(STM32L0) || defined(STM32L1) || defined(STM32L4) || defined(STM32H7)  ||defined(STM32G0) || defined(STM32G4) || \
        defined(STM32WB) || defined(STM32MP1) )
   #if defined(NB_USE_STM32)
     #undef NB_USE_STM32
   #endif
   #define NB_USE_STM32      true
+
+#elif ( defined(ARDUINO_NANO_RP2040_CONNECT) || defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_RASPBERRY_PI_PICO) || \
+      defined(ARDUINO_GENERIC_RP2040) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) )
+  #if defined(NB_USE_RP2040)
+    #undef NB_USE_RP2040
+  #endif
+  #define NB_USE_RP2040      true
+    
 #endif
 
 ///////////////////////////////////////////
@@ -465,7 +471,59 @@
     #define BOARD_TYPE  "STM32 Unknown"
   #endif  
 
+#elif (NB_USE_RP2040)
+
+  // Must define these pins for RP2040
+  #if !defined(SerialNB)
+    #warning Using default SerialNB = Serial1
+
+    #define SerialNB   Serial1
+  #else
+    #warning Using SerialNB from sketch  
+  #endif
+  
+  #if !( defined(NB_RESETN) && defined(NB_DTR) )
+    #warning Using default NB_RESETN(10), NB_DTR(11)
+    #define NB_RESETN  (10u)
+    #define NB_DTR     (11u)
+
+  #else
+    #warning Using NB_RESETN and NB_DTR pins from sketch  
+  #endif
+   
+  #if defined(ARDUINO_ARCH_MBED)
+
+    #warning Using RP2040 and ARDUINO_ARCH_MBED
+  
+    #if ( defined(ARDUINO_NANO_RP2040_CONNECT)    || defined(ARDUINO_RASPBERRY_PI_PICO) || \
+          defined(ARDUINO_GENERIC_RP2040) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) )
+      // Only undef known BOARD_NAME to use better one
+      #undef BOARD_NAME
+    #endif
+    
+    #if defined(ARDUINO_RASPBERRY_PI_PICO)
+      #define BOARD_NAME      "MBED RASPBERRY_PI_PICO"
+    #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
+      #define BOARD_NAME      "MBED ADAFRUIT_FEATHER_RP2040"
+    #elif defined(ARDUINO_GENERIC_RP2040)
+      #define BOARD_NAME      "MBED GENERIC_RP2040"
+    #elif defined(ARDUINO_NANO_RP2040_CONNECT) 
+      #define BOARD_NAME      "MBED NANO_RP2040_CONNECT"
+    #else
+      // Use default BOARD_NAME if exists
+      #if !defined(BOARD_NAME)
+        #define BOARD_NAME      "MBED Unknown RP2040"
+      #endif
+    #endif
+   
+  #else
+  
+      #warning Using RP2040 and arduino-pico core
+        
+  #endif  
+  
 #else
+
   // Must define these pins for this board
   #if !defined(SerialNB)
     #warning Using default SerialNB = Serial1

@@ -1,8 +1,8 @@
 {
   "name":"NB_Generic",
-  "version": "1.1.0",
-  "description":"Enables NB-IoT/LTE-M/CAT M1 network connection using the Generic NB-IoT modules (u-blox SARA R4, etc.) and boards. Use this library to send and receive SMS using Generic NB-IoT/GPRS modules, such as u-blox SARA-R4xx module.This library also allows you to connect to internet Web Clients through the NB-IoT/LTE-M/CAT M1 networks.",
-  "keywords":"nb, gprs, udp, tcp, http, https, webclient, esp8266, esp32, esp32-s2, stm32, samd, sam-due, nrf52, ublox, sara-r4, SIM7000, u-blox, ublox, Quectel, SIMCOM, AI-Thinker, LTE, LTE-M, NB-IoT, LTE-M, CAT-M1, at-commands, AT",
+  "version": "1.2.0",
+  "description":"Enables NB-IoT/LTE-M/CAT M1 network connection using the Generic NB-IoT modules (u-blox SARA R4, etc.) and boards. Use this library to send and receive SMS using Generic NB-IoT/GPRS modules, such as u-blox SARA-R4xx module.This library also allows you to connect to internet Web Clients through the NB-IoT/LTE-M/CAT M1 networks. Supporting ESP32 (including ESP32-S2, ESP32-C3), ESP8266, Teensy, SAM DUE, SAMD21, SAMD51, STM32F/L/H/G/WB/MP1, nRF52, RP2040-based boards, etc.",
+  "keywords":"nb, gprs, esp8266, esp32, rp2040, stm32, samd, sam-due, nrf52, ublox, sara-r4, ublox, Quectel, SIMCOM, LTE, LTE-M, NB-IoT, LTE-M, CAT-M1, SIM7000, u-blox, AI-Thinker, udp, tcp, http, https, webclient, at-commands, AT",
   "authors": 
   [
     {

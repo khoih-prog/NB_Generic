@@ -32,9 +32,22 @@
 //////////////////////////////////////////////
 
 #if defined(ARDUINO_SAMD_MKRNB1500)
-  #define SerialNB      SerialSARA
-  #define NB_RESETN     SARA_RESETN
-  #define NB_PWR        SARA_PWR_ON
+
+  #define USING_CUSTOMIZED_MKRNB1500      false
+  
+  #if USING_CUSTOMIZED_MKRNB1500
+  
+    #define SerialNB      Serial1
+    #define NB_RESETN     (3u)
+    #define NB_PWR        (2u)
+    
+  #else
+  
+    #define SerialNB      SerialSARA
+    #define NB_RESETN     SARA_RESETN
+    #define NB_PWR        SARA_PWR_ON
+    
+  #endif
 #else
   // Override the default (and certainly not good) pins and port
   // Only for boards other than ARDUINO_SAMD_MKRNB1500

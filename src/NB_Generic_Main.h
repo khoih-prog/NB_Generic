@@ -18,13 +18,14 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.1.0
+  Version: 1.2.0
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0    K Hoang     18/03/2021 Initial public release to add support to many boards / modules besides MKRNB 1500 / SARA R4
   1.0.1    K Hoang     18/03/2021 Add Advanced examples (MQTT, Blynk)
   1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
+  1.2.0    K Hoang     28/06/2021 Add support to RP2040-based boards using Arduino mbed or Arduino-pico core
  **********************************************************************************************************************************/
 
 #pragma once
@@ -32,7 +33,7 @@
 #ifndef _NB_GENERIC_MAIN_H_INCLUDED
 #define _NB_GENERIC_MAIN_H_INCLUDED
 
-#define NB_GENERIC_VERSION     "NB_Generic v1.1.0"
+#define NB_GENERIC_VERSION     "NB_Generic v1.2.0"
 
 #include <stdarg.h>
 #include <stdio.h>

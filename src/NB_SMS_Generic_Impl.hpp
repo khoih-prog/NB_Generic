@@ -18,7 +18,7 @@
   You should have received a copy of the GNU General Public License along with this program.
   If not, see <https://www.gnu.org/licenses/>.  
  
-  Version: 1.3.0
+  Version: 1.3.1
   
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -27,6 +27,7 @@
   1.1.0    K Hoang     19/03/2021 Rewrite to prepare for supporting more GSM/GPRS modules. Add FileUtils examples.
   1.2.0    K Hoang     28/06/2021 Add support to RP2040-based boards using Arduino mbed or Arduino-pico core
   1.3.0    K Hoang     14/08/2021 Add support to Adafruit nRF52 core v0.22.0+
+  1.3.1    K Hoang     10/10/2021 Update `Packages' Patches`
  **********************************************************************************************************************************/
 
 #pragma once

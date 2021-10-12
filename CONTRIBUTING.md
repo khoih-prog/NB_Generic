@@ -14,8 +14,8 @@ If you don't find anything, please [open a new issue](https://github.com/khoih-p
 
 Please ensure to specify the following:
 
-* Arduino IDE version (e.g. 1.8.15) or Platform.io version
-* `ESP8266`,`ESP32` or `STM32` Core Version (e.g. ESP8266 core v3.0.2, ESP32 v1.0.6 or STM32 v2.0.0)
+* Arduino IDE version (e.g. 1.8.16) or Platform.io version
+* `ESP8266`,`ESP32` or `STM32` Core Version (e.g. ESP8266 core v3.0.2, ESP32 v2.0.0 or STM32 v2.1.0)
 * Contextual information (e.g. what you were trying to achieve)
 * Simplest possible steps to reproduce
 * Anything that might be relevant in your opinion, such as:
@@ -26,11 +26,11 @@ Please ensure to specify the following:
 ### Example
 
 ```
-Arduino IDE version: 1.8.15
-Arduino-mbed RP2040 v2.4.1
+Arduino IDE version: 1.8.16
+Arduino-mbed RP2040 v2.5.2
 NANO_RP2040_CONNECT Module
 OS: Ubuntu 20.04 LTS
-Linux xy-Inspiron-3593 5.4.0-81-generic #91-Ubuntu SMP Thu Jul 15 19:09:17 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
+Linux xy-Inspiron-3593 5.4.0-86-generic #97-Ubuntu SMP Fri Sep 17 19:19:40 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
 
 Context:
 I encountered an endless loop while trying to connect to Local WiFi.

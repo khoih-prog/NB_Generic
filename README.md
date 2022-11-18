@@ -124,7 +124,7 @@ This library is based on, modified, bug-fixed and improved from:
 
 to add support to many boards besides `Arduino MKR NB 1500`.
 
-This [NB_Generic library](https://github.com/khoih-prog/NB_Generic) will finally provide these following features (certainly ony if supported by the NB-IoT/LTE-M/GPRS modules)
+This [NB_Generic library](https://github.com/khoih-prog/NB_Generic) will finally provide these following features (certainly only if supported by the NB-IoT/LTE-M/GPRS modules)
 
 1. **TCP Client** (HTTP, **HTTPS**, MQTT, Blynk, WebSockets, ...)
 2. **UDP** data connections
@@ -391,7 +391,7 @@ Supposing the STM32 stm32 core version is 2.1.0. These files must be copied into
 - `~/.arduino15/packages/STM32/hardware/stm32/2.1.0/system/STM32F7xx/stm32f7xx_hal_conf_default.h` for Nucleo-144 STM32F7.
 
 Whenever a new version is installed, remember to copy this file into the new version directory. For example, new version is x.yy.zz,
-theses files must be copied into the corresponding directory:
+these files must be copied into the corresponding directory:
 
 - `~/.arduino15/packages/STM32/hardware/stm32/x.yy.zz/system/STM32F4xx/stm32f4xx_hal_conf_default.h`
 - `~/.arduino15/packages/STM32/hardware/stm32/x.yy.zz/system/STM32F7xx/stm32f7xx_hal_conf_default.h
@@ -407,7 +407,7 @@ Supposing the STM32 stm32 core version is 2.1.0. These files must be copied into
 - `~/.arduino15/packages/STM32/hardware/stm32/2.1.0/variants/STM32L0xx/L052R(6-8)T_L053R(6-8)T_L063R8T/NUCLEO_L053R8/variant.h` for Nucleo-64 NUCLEO_L053R8.
 
 Whenever a new version is installed, remember to copy this file into the new version directory. For example, new version is x.yy.zz,
-theses files must be copied into the corresponding directory:
+these files must be copied into the corresponding directory:
 
 - `~/.arduino15/packages/STM32/hardware/stm32/x.yy.zz/variants/STM32F7xx/F765Z(G-I)T_F767Z(G-I)T_F777ZIT/NUCLEO_F767ZI/variant.h`
 - `~/.arduino15/packages/STM32/hardware/stm32/x.yy.zz/variants/STM32L0xx/L052R(6-8)T_L053R(6-8)T_L063R8T/NUCLEO_L053R8/variant.h`
@@ -1396,7 +1396,7 @@ For example
 
 #### 2. How to select which Serial port to communicate to NB module
 
-Select the corresponding `Serial` port to use to communicate (sending AT conmmands and receiving responces) to NB module
+Select the corresponding `Serial` port to use to communicate (sending AT conmmands and receiving responses) to NB module
 Remember to connect the board and modem correspondingly.
 
 ```cpp
